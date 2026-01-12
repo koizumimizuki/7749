@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7749 - チャトランガ - ゲームルール</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+            line-height: 1.8;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        /* 追加: ナビゲーション用のスタイル */
+        .nav-links {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: bold;
+            margin-left: 20px;
+            padding: 8px 15px;
+            border-radius: 5px;
+            background-color: #f0f7ff;
+            transition: all 0.3s ease;
+        }
+        .nav-links a:hover {
+            background-color: #667eea;
+            color: white;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: #764ba2;
+            margin-top: 35px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-left: 5px solid #764ba2;
+            padding-left: 15px;
+        }
+        h3 {
+            color: #667eea;
+            margin-top: 25px;
+            margin-bottom: 12px;
+            font-size: 1.4em;
+        }
+        .intro {
+            text-align: center;
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+        .piece-symbol {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .board-example {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            border: 2px solid #ddd;
+        }
+        .piece-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .piece-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 1.1em;
+        }
+        .piece-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .piece-table tr:hover { background: #f0f7ff; }
+        .highlight-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .important-note {
+            background: #ffebee;
+            border: 2px solid #f44336;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .promotion-zone {
+            background: linear-gradient(135deg, #ffe4e4, #ffb4b4);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 2px solid #ff6b6b;
+        }
+        ul, ol { margin-left: 30px; margin-top: 10px; margin-bottom: 15px; }
+        li { margin-bottom: 8px; }
+        .rule-section { margin-bottom: 35px; }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+        .footer {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            text-align: center;
+            color: #999;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 追加: ナビゲーションリンク -->
+        <div class="nav-links">
+            <a href="index.html">🏠 メインページ</a>
+        </div>
+
+        <h1>⚔️ 7749 - チャトランガ - ゲームルール</h1>
+
+        <div class="intro">
+            古代インドのチェスの原型「チャトランガ」をベースにした<br>
+            7×7盤面の戦略ゲーム<br>
+            <strong>持ち駒システム</strong>と<strong>成りルール</strong>が特徴
+        </div>
+
+        <!-- ===== 基本情報 ===== -->
+        <div class="rule-section">
+            <h2>📋 基本情報</h2>
+            <ul>
+                <li><strong>盤面サイズ：</strong>7×7マス（49マス）</li>
+                <li><strong>プレイヤー：</strong>2人（先手・後手）</li>
+                <li><strong>勝利条件：</strong>相手の王（キング）を取る（チェックメイト）</li>
+                <li><strong>引き分け条件：</strong>
+                    <ul>
+                        <li>千日手（同一局面が<strong>4回</strong>出現）</li>
+                        <li>250手に達した場合</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ===== 駒の種類と動き ===== -->
+        <div class="rule-section">
+            <h2>♟️ 駒の種類と動き方</h2>
+
+            <table class="piece-table">
+                <thead>
+                    <tr>
+                        <th>駒名</th>
+                        <th>記号（先手/後手）</th>
+                        <th>動き方</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>歩兵（ポーン）</strong></td>
+                        <td><span class="piece-symbol">♙ / ♟</span></td>
+                        <td>
+                            前方に1マス進む<br>
+                            駒を取る場合も前方1マス（将棋と同じ）<br>
+                            ※斜め移動はできない
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>騎士（ナイト）</strong></td>
+                        <td><span class="piece-symbol">♘ / ♞</span></td>
+                        <td>L字型（2マス直進+1マス横）に移動<br>他の駒を飛び越えられる</td>
+                    </tr>
+                    <tr>
+                        <td><strong>僧侶（ビショップ）</strong></td>
+                        <td><span class="piece-symbol">♗ / ♝</span></td>
+                        <td>斜め方向に何マスでも移動可能</td>
+                    </tr>
+                    <tr>
+                        <td><strong>戦車（ルーク）</strong></td>
+                        <td><span class="piece-symbol">♖ / ♜</span></td>
+                        <td>縦横方向に何マスでも移動可能</td>
+                    </tr>
+                    <tr>
+                        <td><strong>后（クイーン）</strong></td>
+                        <td><span class="piece-symbol">♕ / ♛</span></td>
+                        <td>縦横斜め全方向に何マスでも移動可能</td>
+                    </tr>
+                    <!-- 修正済み -->
+                    <tr>
+                        <td><strong>星（スター）</strong></td>
+                        <td><span class="piece-symbol">☆ / ★</span></td>
+                        <td>縦横斜め全方向に1マスだけ移動可能（王と同じ）</td>
+                    </tr>
+                    <tr>
+                        <td><strong>王（キング）</strong></td>
+                        <td><span class="piece-symbol">♔ / ♚</span></td>
+                        <td>縦横斜め全方向に1マスだけ移動可能</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ===== 成りのルール ===== -->
+        <div class="rule-section">
+            <h2>⭐ 成り（プロモーション）のルール</h2>
+
+            <div class="promotion-zone">
+                <h3>敵陣エリア</h3>
+                <ul>
+                    <li><strong>先手（白）の敵陣：</strong>盤面の最上部2列（0行目、1行目）</li>
+                    <li><strong>後手（黒）の敵陣：</strong>盤面の最下部2列（5行目、6行目）</li>
+                </ul>
+            </div>
+
+            <h3>成りの条件</h3>
+            <ul>
+                <li><strong>王と星以外の駒</strong>は敵陣に関わる移動を行うと成る</li>
+                <li>成りは<strong>強制</strong>（成らない選択はできない）</li>
+                <li>成った駒には<strong>金色の円</strong>が表示される</li>
+            </ul>
+
+            <h3>成った駒の効果</h3>
+            <div class="board-example">
+                <p><strong>成りの効果は以下の通りです：</strong></p>
+                <ul>
+                    <!-- 修正済み -->
+                    <li><strong>歩兵・騎士・僧侶・戦車：</strong><br>
+                        元の動き ＋ <strong>「星（全方位1マス）」の動きを追加</strong></li>
+                    <li><strong>后（クイーン）：</strong><br>
+                        元の動き ＋ <strong>「騎士（ナイト）」の動きを追加</strong>（最強の駒になります）</li>
+                </ul>
+                <p style="margin-top: 10px;">※ 成ることで死角が消え、強力になります</p>
+            </div>
+
+            <div class="highlight-box">
+                <strong>🔄 成りの発動タイミング（強制）：</strong>
+                <ul>
+                    <li>敵陣<strong>内から内</strong>への移動時</li>
+                    <li>敵陣<strong>外から内</strong>への移動時</li>
+                    <li>敵陣<strong>内から外</strong>への移動時</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== 持ち駒システム ===== -->
+        <div class="rule-section">
+            <h2>🎯 持ち駒システム</h2>
+
+            <h3>駒の捕獲</h3>
+            <ul>
+                <li>相手の駒を取ると、その駒は<strong>自分の持ち駒</strong>になる</li>
+                <li>成っていた駒を取った場合、<strong>成りは解除</strong>される</li>
+            </ul>
+
+            <h3>駒の打ち込み（ドロップ）</h3>
+            <ul>
+                <li>自分の手番で、持ち駒を<strong>空いているマス</strong>に配置できる</li>
+                <li>打ち込んだ駒は<strong>通常の状態</strong>（成っていない）</li>
+            </ul>
+
+            <div class="important-note">
+                <strong>⚠️ 打ち込みの制限：</strong>
+                <ul>
+                    <!-- 修正済み -->
+                    <li><strong>二歩（同じ列に歩を打つ）は可能です</strong>（将棋とは異なります）</li>
+                    <li>歩兵は最奥行（敵の最終列）に打てない</li>
+                    <li>駒がある場所には打てない</li>
+                    <li>打ち込んだ直後は成れない（次のターン以降の移動時に判定）</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ===== 初期配置 ===== -->
+        <div class="rule-section">
+            <h2>🎮 初期配置</h2>
+
+            <h3>先手（白駒：下側）</h3>
+            <div class="board-example">
+                <p><strong>最後列（6行目）：</strong></p>
+                <!-- 修正済み -->
+                <code>（空） ☆ ♕ ♔ ♘ ♖ ♗</code>
+
+                <p style="margin-top: 10px;"><strong>2列目（5行目）：</strong></p>
+                <code>♙ ♙ ♙ ♙ ♙ ♙ ♙</code>
+            </div>
+
+            <h3>後手（黒駒：上側）</h3>
+            <div class="board-example">
+                <p><strong>最前列（0行目）：</strong></p>
+                <!-- 修正済み -->
+                <code>♝ ♜ ♞ ♚ ♛ ★ （空）</code>
+                <p style="margin-top: 10px;"><strong>2列目（1行目）：</strong></p>
+                <code>♟ ♟ ♟ ♟ ♟ ♟ ♟</code>
+                <p style="margin-top: 15px;"><strong>持ち駒（初期ハンデ）：</strong></p>
+                <!-- 修正済み -->
+                <span class="piece-symbol">♟（歩兵）× 1</span>
+            </div>
+
+            <div class="highlight-box">
+                <strong>💡 ポイント：</strong> 後手は最初から「歩」を持ち駒として持ってスタートします。これがハンデキャップとして機能します。
+            </div>
+        </div>
+
+        <!-- ===== 特殊ルール ===== -->
+        <div class="rule-section">
+            <h2>🎲 特殊ルール</h2>
+            <h3>千日手（引き分け）</h3>
+            <ul>
+                <li>同じ局面が<strong>4回</strong>出現すると引き分け</li>
+            </ul>
+        </div>
+
+        <!-- ===== 戦略のヒント ===== -->
+        <div class="rule-section">
+            <h2>💡 戦略のヒント</h2>
+            <div class="board-example">
+                <h3>駒の価値（目安）</h3>
+                <ul>
+                    <li>歩兵：100点</li>
+                    <!-- 修正済み -->
+                    <li>星：250点</li>
+                    <li>騎士：320点</li>
+                    <li>僧侶：330点</li>
+                    <li>戦車：500点</li>
+                    <li>后：900点</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>7749 - チャトランガ - v8.15最終版</p>
+            <p>古代の知恵と現代の戦略が融合したゲーム</p>
+        </div>
+    </div>
+</body>
+</html>

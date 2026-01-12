@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>7749-チャトランガ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>⚔️ 7749-チャトランガ</h1>
+        
+        <div class="game-area">
+            <div class="hand-area" id="black-hand">
+                <h3>後手持ち駒</h3>
+                <div class="hand-pieces" id="black-hand-pieces"></div>
+            </div>
+            
+            <div class="board-container">
+                <div class="row-labels">
+                    <div class="label"></div>
+                    <div class="label">7</div>
+                    <div class="label">6</div>
+                    <div class="label">5</div>
+                    <div class="label">4</div>
+                    <div class="label">3</div>
+                    <div class="label">2</div>
+                    <div class="label">1</div>
+                </div>
+                <div class="board-with-labels">
+                    <div class="col-labels">
+                        <div class="label">A</div>
+                        <div class="label">B</div>
+                        <div class="label">C</div>
+                        <div class="label">D</div>
+                        <div class="label">E</div>
+                        <div class="label">F</div>
+                        <div class="label">G</div>
+                    </div>
+                    <div id="board"></div>
+                </div>
+            </div>
+            
+            <div class="hand-area" id="white-hand">
+                <h3>先手持ち駒</h3>
+                <div class="hand-pieces" id="white-hand-pieces"></div>
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <div id="turn-indicator">読み込み中...</div>
+            <div id="status"></div>
+            <div id="move-count">手数: 0</div>
+        </div>
+        
+        <div class="controls">
+            <button id="reset-btn">リセット</button>
+            <button id="undo-btn">待った</button>
+        </div>
+
+        <div class="ai-controls">
+            <h3>AI設定</h3>
+            <div class="ai-options">
+                <label>
+                    <input type="radio" name="game-mode" value="pvp" checked> 対人戦
+                </label>
+                <label>
+                    <input type="radio" name="game-mode" value="ai-black"> AI後手（あなたが先手）
+                </label>
+                <label>
+                    <input type="radio" name="game-mode" value="ai-white"> AI先手（あなたが後手）
+                </label>
+                <label>
+                    <input type="radio" name="game-mode" value="ai-vs-ai"> AI自己対局
+                </label>
+            </div>
+            <div class="ai-strength">
+                <label>先手AI: 
+                    <select id="ai-depth-white">
+                        <option value="1">Lv1 (超初心者)</option>
+                        <option value="2">Lv2</option>
+                        <option value="3">Lv3</option>
+                        <option value="4">Lv4 (初心者)</option>
+                        <option value="5">Lv5</option>
+                        <option value="6">Lv6</option>
+                        <option value="7">Lv7 (やや弱い)</option>
+                        <option value="8">Lv8</option>
+                        <option value="9">Lv9</option>
+                        <option value="10">Lv10 (普通)</option>
+                        <option value="11">Lv11</option>
+                        <option value="12">Lv12</option>
+                        <option value="13" selected>Lv13 (やや強い)</option>
+                        <option value="14">Lv14</option>
+                        <option value="15">Lv15</option>
+                        <option value="16">Lv16 (強い)</option>
+                        <option value="17">Lv17</option>
+                        <option value="18">Lv18</option>
+                        <option value="19">Lv19 (最強)</option>
+                        <option value="20">Lv20</option>
+                    </select>
+                </label>
+                <label>後手AI: 
+                    <select id="ai-depth-black">
+                        <option value="1">Lv1 (超初心者)</option>
+                        <option value="2">Lv2</option>
+                        <option value="3">Lv3</option>
+                        <option value="4">Lv4 (初心者)</option>
+                        <option value="5">Lv5</option>
+                        <option value="6">Lv6</option>
+                        <option value="7">Lv7 (やや弱い)</option>
+                        <option value="8">Lv8</option>
+                        <option value="9">Lv9</option>
+                        <option value="10">Lv10 (普通)</option>
+                        <option value="11">Lv11</option>
+                        <option value="12">Lv12</option>
+                        <option value="13" selected>Lv13 (やや強い)</option>
+                        <option value="14">Lv14</option>
+                        <option value="15">Lv15</option>
+                        <option value="16">Lv16 (強い)</option>
+                        <option value="17">Lv17</option>
+                        <option value="18">Lv18</option>
+                        <option value="19">Lv19 (最強)</option>
+                        <option value="20">Lv20</option>
+                    </select>
+                </label>
+            </div>
+            <div class="self-play-controls" id="self-play-controls" style="display:none;">
+                <button id="start-self-play">自己対局開始</button>
+                <button id="stop-self-play" disabled>停止</button>
+                <label>
+                    対局速度:
+                    <select id="self-play-speed">
+                        <option value="1000">遅い</option>
+                        <option value="500" selected>普通</option>
+                        <option value="200">速い</option>
+                        <option value="50">最速</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+
+        <div class="kifu-panel">
+            <h3>棋譜</h3>
+            <div class="kifu-navigation">
+                <button id="kifu-start" title="最初へ">|◀</button>
+                <button id="kifu-prev" title="前へ">◀</button>
+                <button id="kifu-next" title="次へ">▶</button>
+                <button id="kifu-end" title="最後へ">▶|</button>
+                <span id="kifu-position">0/0</span>
+                <button id="ai-think" title="この局面でAIに考えさせる">🤖 AI思考</button>
+                <button id="resume-from-here" title="この局面から手動で続行">▶ 続行</button>
+            </div>
+            <div id="kifu-list" class="kifu-list"></div>
+            <div class="kifu-controls">
+                <button id="copy-kifu-btn">コピー</button>
+                <button id="download-kifu-btn">保存</button>
+                <button id="load-kifu-btn">読込</button>
+            </div>
+            <input type="file" id="kifu-file-input" accept=".txt" style="display:none;">
+        </div>
+    </div>
+    
+    <script src="chaturanga.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

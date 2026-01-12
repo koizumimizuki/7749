@@ -1,0 +1,834 @@
+hand-pieces* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Hiragino Sans', sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    text-align: center;
+}
+
+h1 {
+    color: #eee;
+    margin-bottom: 20px;
+    font-size: 2em;
+}
+
+.game-area {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.hand-area {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 15px;
+    min-width: 80px;
+    min-height: 200px;
+}
+
+.hand-area h3 {
+    color: #aaa;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+/* 持ち駒エリア */
+.hand-pieces {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 10px;
+    min-height: 50px;
+}
+
+.hand-piece {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 60px;
+    border: 2px solid #666;
+    border-radius: 5px;
+    background: #f5f5dc;
+    cursor: pointer;
+    font-size: 28px;
+    line-height: 1;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.hand-piece.selected {
+    border-color: #ff6600;
+    background: #ffe4b5;
+    box-shadow: 0 0 10px #ff6600;
+}
+
+.hand-piece:hover {
+    background: #fffacd;
+}
+
+/* 持ち駒の個数表示 */
+.hand-piece::after {
+    content: attr(data-count);
+    font-size: 12px;
+    color: #333;
+}
+
+.hand-piece .count {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ボードコンテナ */
+.board-container {
+    display: flex;
+    gap: 4px;
+    margin: 0 auto;
+    align-items: flex-start;
+}
+
+/* 行ラベル（1-7、左側） */
+.row-labels {
+    display: flex;
+    flex-direction: column;
+}
+
+.row-labels .label {
+    width: 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #f0f0f0;
+    font-size: 24px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.row-labels .label:first-child {
+    height: 36px;
+}
+
+/* 列ラベル（a-g、上部） */
+.board-with-labels {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.col-labels {
+    display: flex;
+    padding-left: 5px;
+}
+
+.col-labels .label {
+    width: 60px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #f0f0f0;
+    font-size: 24px;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ボード */
+#board {
+    display: grid;
+    grid-template-columns: repeat(7, 60px);
+    grid-template-rows: repeat(7, 60px);
+    gap: 1px;
+    background-color: #2c3e50;
+    padding: 2px;
+    border: 3px solid #2c3e50;
+    border-radius: 4px;
+}
+
+/* cell クラス（app.jsで使用） */
+.cell {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 40px;
+    cursor: pointer;
+    transition: background 0.15s;
+    position: relative;
+}
+
+.cell.light {
+    background: #DEB887;
+}
+
+.cell.dark {
+    background: #CD853F;
+}
+
+.cell:hover {
+    filter: brightness(1.1);
+}
+
+.cell.selected {
+    background: #4CAF50 !important;
+}
+
+.cell.movable {
+    background: #90EE90 !important;
+    cursor: pointer;
+}
+
+.cell.movable.has-enemy {
+    background: #FFB6C1 !important;
+}
+
+.cell.last-move {
+    box-shadow: inset 0 0 0 3px #FF9800;
+}
+
+.cell.last-from {
+    box-shadow: inset 0 0 0 3px #2196F3;
+}
+
+.cell.last-to {
+    box-shadow: inset 0 0 0 3px #FF9800;
+}
+
+.cell.in-check {
+    background: #ff6b6b !important;
+    animation: check-pulse 0.5s infinite alternate;
+}
+
+@keyframes check-pulse {
+    from { background: #ff6b6b; }
+    to { background: #ff4444; }
+}
+
+.piece {
+    user-select: none;
+    pointer-events: none;
+}
+
+.piece.white-piece {
+    color: #fff;
+    text-shadow: 1px 1px 2px #000, -1px -1px 2px #000;
+}
+
+.piece.black-piece {
+    color: #333;
+    text-shadow: 1px 1px 2px #fff, -1px -1px 2px #fff;
+}
+
+.piece.promoted {
+    position: relative;
+}
+
+.piece.promoted::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 52px;
+    border: 4px solid gold;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.info-panel {
+    margin-top: 20px;
+    color: #eee;
+}
+
+#turn-indicator {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+#turn-indicator.white-turn {
+    color: #fff;
+}
+
+#turn-indicator.black-turn {
+    color: #aaa;
+}
+
+#turn-indicator.thinking {
+    color: #ffd700;
+}
+
+#turn-indicator.replay {
+    color: #ff6b6b;
+}
+
+#turn-indicator.thinking::after {
+    content: '...';
+    animation: dots 1s infinite;
+}
+
+@keyframes dots {
+    0%, 20% { content: '.'; }
+    40% { content: '..'; }
+    60%, 100% { content: '...'; }
+}
+
+#status {
+    color: #ff6b6b;
+    font-size: 1.2em;
+    min-height: 30px;
+    font-weight: bold;
+}
+
+#status.winner {
+    color: #4CAF50;
+    font-size: 1.5em;
+}
+
+#move-count {
+    color: #888;
+    margin-top: 5px;
+}
+
+.controls {
+    margin-top: 20px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.controls button {
+    padding: 12px 30px;
+    font-size: 1.1em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    font-weight: bold;
+}
+
+.controls button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.controls button:active {
+    transform: translateY(0);
+}
+
+#reset-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+#undo-btn {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: white;
+}
+
+#undo-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.kifu-panel {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 15px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.kifu-panel h3 {
+    color: #aaa;
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+/* 棋譜ナビゲーション */
+.kifu-navigation {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.kifu-navigation button {
+    padding: 5px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #4a4a6a;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    min-width: 40px;
+}
+
+.kifu-navigation button:hover {
+    background: #5a5a8a;
+}
+
+.kifu-navigation button:disabled {
+    background: #3a3a4a;
+    color: #666;
+    cursor: not-allowed;
+}
+
+#kifu-position {
+    margin-left: 10px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.kifu-list {
+    background: rgba(0,0,0,0.3);
+    border-radius: 5px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    text-align: left;
+    font-family: monospace;
+    font-size: 14px;
+    color: #ddd;
+    min-height: 50px;
+}
+
+/* 棋譜リストのクリック可能な手 */
+.kifu-list .move-entry {
+    display: inline-block;
+    margin: 2px 5px;
+    padding: 2px 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.kifu-list .move-entry:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.kifu-list .move-entry.current {
+    background: rgba(100, 149, 237, 0.4);
+    font-weight: bold;
+}
+
+.kifu-list .move-entry.future {
+    opacity: 0.5;
+}
+
+.kifu-list .move-entry.white {
+    color: #fff;
+}
+
+.kifu-list .move-entry.black {
+    color: #aaa;
+}
+
+.kifu-list .move-number {
+    color: #888;
+    margin-right: 3px;
+}
+
+.kifu-controls {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.kifu-controls button {
+    padding: 8px 20px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #555;
+    color: white;
+    transition: background 0.2s;
+}
+
+.kifu-controls button:hover {
+    background: #777;
+}
+
+/* 読込ボタン */
+#load-kifu-btn {
+    background: #6a4a8a;
+}
+
+#load-kifu-btn:hover {
+    background: #8a5aaa;
+}
+
+.ai-controls {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 15px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ai-controls h3 {
+    color: #aaa;
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.ai-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.ai-options label {
+    color: #ddd;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-options input[type="radio"] {
+    cursor: pointer;
+}
+
+.ai-strength {
+    color: #ddd;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.ai-strength label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ai-strength select {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    background: #444;
+    color: #fff;
+    cursor: pointer;
+}
+
+.self-play-controls {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.self-play-controls button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+#start-self-play {
+    background: #4CAF50;
+    color: white;
+}
+
+#start-self-play:hover {
+    background: #45a049;
+}
+
+#stop-self-play {
+    background: #f44336;
+    color: white;
+}
+
+#stop-self-play:hover:not(:disabled) {
+    background: #da190b;
+}
+
+#stop-self-play:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+.self-play-controls select {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    background: #444;
+    color: #fff;
+}
+
+.self-play-controls label {
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#ai-think {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+#ai-think:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+#ai-think:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+#resume-from-here {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 5px;
+}
+
+#resume-from-here:hover {
+    background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+}
+
+#resume-from-here:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+/* スマホ対応 */
+@media screen and (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+    
+    h1 {
+        font-size: 1.4em;
+    }
+    
+    .game-area {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .hand-area {
+        width: 90%;
+        min-width: unset;
+        min-height: unset;
+        padding: 10px;
+    }
+    
+    /* 後手の持ち駒を上に、先手の持ち駒を下に */
+    #black-hand {
+        order: -1 !important;
+    }
+    
+    .board-container {
+        order: 0 !important;
+    }
+    
+    #white-hand {
+        order: 1 !important;
+    }
+    
+    .hand-pieces {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+    }
+    
+    .hand-piece {
+        width: 40px;
+        height: 50px;
+        font-size: 22px;
+    }
+    
+    /* ボードコンテナ */
+    .board-container {
+        display: flex;
+        gap: 2px;
+    }
+    
+    /* ボードサイズ調整 */
+    #board {
+        grid-template-columns: repeat(7, 42px) !important;
+        grid-template-rows: repeat(7, 42px) !important;
+    }
+    
+    .cell {
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 28px !important;
+    }
+    
+    .row-labels .label {
+        width: 20px;
+        height: 42px;
+        font-size: 14px;
+    }
+    
+    .row-labels .label:first-child {
+        height: 20px;
+    }
+    
+    .col-labels .label {
+        width: 42px;
+        height: 20px;
+        font-size: 14px;
+    }
+    
+    .piece.promoted::before {
+        width: 36px;
+        height: 36px;
+        border-width: 3px;
+    }
+    
+    /* コントロール */
+    .controls {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .controls button {
+        padding: 10px 20px;
+        font-size: 1em;
+    }
+    
+    /* 棋譜パネル */
+    .kifu-panel {
+        max-width: 100%;
+        padding: 10px;
+    }
+    
+    .kifu-navigation {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+    
+    .kifu-navigation button {
+        padding: 6px 10px;
+        min-width: 35px;
+        font-size: 12px;
+    }
+    
+    #ai-think, #resume-from-here {
+        margin-left: 0 !important;
+        margin-top: 5px;
+    }
+    
+    /* AIコントロール */
+    .ai-controls {
+        max-width: 100%;
+    }
+    
+    .ai-strength {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .self-play-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .ai-options {
+        align-items: flex-start;
+    }
+}
+
+/* さらに小さい画面用 */
+@media screen and (max-width: 380px) {
+    #board {
+        grid-template-columns: repeat(7, 36px) !important;
+        grid-template-rows: repeat(7, 36px) !important;
+    }
+    
+    .cell {
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 24px !important;
+    }
+    
+    .row-labels .label {
+        width: 18px;
+        height: 36px;
+        font-size: 12px;
+    }
+    
+    .row-labels .label:first-child {
+        height: 18px;
+    }
+    
+    .col-labels .label {
+        width: 36px;
+        height: 18px;
+        font-size: 12px;
+    }
+    
+    .hand-piece {
+        width: 35px;
+        height: 42px;
+        font-size: 18px;
+    }
+    
+    .piece.promoted::before {
+        width: 30px;
+        height: 30px;
+        border-width: 2px;
+    }
+}

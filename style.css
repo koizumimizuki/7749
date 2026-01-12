@@ -832,3 +832,30 @@ h1 {
         border-width: 2px;
     }
 }
+/* ナビゲーションリンク用のスタイル */
+.nav-links {
+    position: absolute; /* 盤面の邪魔にならないように右上に配置 */
+    top: 20px;
+    right: 20px;
+    z-index: 1000; /* 盤面より手前に表示 */
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #4a5568; /* 文字色（少し濃いグレー） */
+    background-color: white;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 25px; /* 丸みのあるボタン */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* 影をつけて浮き上がらせる */
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.nav-links a:hover {
+    background-color: #667eea; /* マウスを乗せた時の色 */
+    color: white;
+    transform: translateY(-2px); /* 少し浮き上がるアニメーション */
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+

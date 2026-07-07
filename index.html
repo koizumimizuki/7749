@@ -150,16 +150,36 @@
             <div class="kifu-controls">
                 <button id="copy-kifu-btn">コピー</button>
                 <button id="download-kifu-btn">保存</button>
+                <button id="download-json-btn">解析付き保存(JSON)</button>
                 <button id="load-kifu-btn">読込</button>
             </div>
-            <input type="file" id="kifu-file-input" accept=".txt" style="display:none;">
+            <input type="file" id="kifu-file-input" accept=".txt,.json,application/json,text/plain" style="display:none">
+        </div>
+        <div class="analysis-panel">
+            <h3>棋譜解析</h3>
+            <div class="analysis-controls">
+                <label>解析の強さ:
+                <select id="analysis-depth">
+                    <option value="13">標準 (Lv13)</option>
+                    <option value="14">Lv14</option>
+                    <option value="15" selected>しっかり (Lv15)</option>
+                    <option value="16">Lv16</option>
+                    <option value="17">Lv17</option>
+                    <option value="18">じっくり (Lv18)</option>
+                </select>
+                </label>
+                <button id="analyze-btn">この棋譜を解析</button>
+                <span id="analysis-progress"></span>
+            </div>
+            <div id="analysis-summary"></div>
+            <canvas id="eval-graph"
+                style="background:#0008;border-radius:6px;margin-top:8px;width:100%;height:140px;"></canvas>
+            <div id="candidate-panel" style="margin-top:10px;"></div>
         </div>
     </div>
     
     <script src="chaturanga.js"></script>
     <script src="app.js"></script>
+    <script src="analysis.js"></script>
 </body>
 </html>
-
-
-

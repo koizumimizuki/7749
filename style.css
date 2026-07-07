@@ -832,6 +832,100 @@ h1 {
         border-width: 2px;
     }
 }
+/* ===== 棋譜解析パネル ===== */
+.analysis-panel {
+    margin-top: 20px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 15px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.analysis-panel h3 {
+    color: #aaa;
+    font-size: 1em;
+    margin-bottom: 10px;
+}
+
+.analysis-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.analysis-controls label {
+    color: #ddd;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.analysis-controls select {
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: none;
+    background: #444;
+    color: #fff;
+    cursor: pointer;
+}
+
+#analyze-btn {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#analyze-btn:disabled {
+    background: #666;
+    cursor: not-allowed;
+}
+
+#analysis-progress {
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+#analysis-summary {
+    color: #eee;
+    font-size: 0.95em;
+    margin-bottom: 5px;
+}
+
+/* 棋譜リストに付ける評価注釈 */
+.move-entry .anno {
+    font-size: 0.85em;
+    margin-left: 4px;
+    opacity: 0.9;
+}
+
+.lbl-best { color: #80d8ff; }
+.lbl-good { color: #69f0ae; }
+.lbl-ok   { color: #cfcfcf; }
+.lbl-inac { color: #ffd54f; }
+.lbl-mist { color: #ffab40; }
+.lbl-blun { color: #ff5252; font-weight: bold; }
+
+/* ===== 候補手パネル ===== */
+#candidate-panel { color: #eee; font-size: 0.9em; }
+#candidate-panel .cand-title { color: #aaa; margin-bottom: 4px; }
+#candidate-panel .cand-row {
+    display: flex; justify-content: space-between;
+    padding: 3px 8px; border-radius: 4px; margin-bottom: 2px;
+    background: rgba(255,255,255,0.06);
+}
+#candidate-panel .cand-row .cand-move { font-weight: bold; }
+#candidate-panel .cand-row .cand-score { color: #80d8ff; }
+#candidate-panel .cand-empty { color: #888; }
+
 /* ナビゲーションリンク用のスタイル */
 .nav-links {
     position: absolute; /* 盤面の邪魔にならないように右上に配置 */

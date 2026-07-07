@@ -164,22 +164,25 @@ function displayBoardState(state) {
 // 棋譜再生：指定位置へ移動
 function goToMove(position) {
     if (position < 0 || position >= savedBoardStates.length) return;
-    
+
     replayPosition = position;
     replayMode = true;
-    
+
     // 最終局面以外なら gameOver を解除
     if (position < savedBoardStates.length - 1) {
         gameOver = false;
     }
-    
+
     displayBoardState(savedBoardStates[position]);
     updateKifuHighlight();
     updateReplayControls();
-    
+
     const turnEl = document.getElementById('turn-indicator');
     turnEl.textContent = '再生モード (' + position + '/' + (savedBoardStates.length - 1) + ')';
     turnEl.classList.add('replay');
+
+    // ★追加：解析グラフがあれば現在位置ラインを連動更新
+    if (typeof renderEvalGraph === 'function') renderEvalGraph();
 }
 
 // 再生モードを終了
@@ -280,6 +283,19 @@ function getKifuText() {
 
 // 棋譜読み込み
 function loadKifu(text) {
+    // JSON形式（解析込み）かどうか判定
+    const trimmed = text.trimStart();
+    if (trimmed.startsWith('{')) {
+        try {
+            const obj = JSON.parse(trimmed);
+            if (obj.format === 'chaturanga-kifu') {
+                loadKifuJson(obj);
+                return;
+            }
+        } catch (e) {
+            console.error('JSON parse failed, falling back to text:', e);
+        }
+    }
     const lines = text.split('\n');
     const moves = [];
     
@@ -348,6 +364,49 @@ function loadKifu(text) {
     checkGameEnd();
     
     return true;
+}
+
+function loadKifuJson(obj) {
+    Engine._engine_reset();
+    moveHistory = [];
+    savedBoardStates = [saveBoardState()];
+    gameOver = false;
+    replayMode = false;
+    replayPosition = 0;
+
+    const moves = obj.moves || [];
+    for (let i = 0; i < moves.length; i++) {
+        const mv = moves[i];
+        if (!applyMoveFromString(mv.move)) {
+            console.error('Failed to replay move:', mv.move);
+            alert('棋譜の再生に失敗しました: ' + mv.move);
+            break;
+        }
+        moveHistory.push({ ply: i + 1, side: mv.side, move: mv.move });
+        saveBoardState();
+    }
+
+    replayPosition = savedBoardStates.length - 1;
+    gameOver = !!obj.gameOver;
+
+    // 解析データの復元
+    if (obj.analysis && Array.isArray(obj.analysis.data)) {
+        analysisData = obj.analysis.data;
+        if (typeof lastMatchRate !== 'undefined' && obj.analysis.matchRate) {
+            lastMatchRate = obj.analysis.matchRate;
+        }
+    } else {
+        analysisData = [];
+    }
+
+    renderBoard();
+    renderKifu();
+
+    // 解析表示を復元（関数が存在すれば）
+    if (analysisData.length > 0) {
+        if (typeof renderAnalysis === 'function') renderAnalysis();
+        if (typeof renderEvalGraph === 'function') renderEvalGraph();
+    }
 }
 
 // 棋譜文字列から手を適用
@@ -1052,6 +1111,38 @@ function setupEventListeners() {
         const a = document.createElement('a');
         a.href = url;
         a.download = 'kifu_' + new Date().toISOString().slice(0, 10) + '.txt';
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('download-json-btn').addEventListener('click', () => {
+        if (typeof analysisData === 'undefined' || !analysisData || analysisData.length === 0) {
+            alert('先に「棋譜解析」を実行してください');
+            return;
+        }
+
+        const obj = {
+            format: 'chaturanga-kifu',
+            version: 1,
+            savedAt: new Date().toISOString(),
+            mode: getGameMode(),
+            gameOver: gameOver,
+            moves: moveHistory.map(m => ({ side: m.side, move: m.move })),
+            analysis: {
+                matchRate: (typeof lastMatchRate !== 'undefined') ? lastMatchRate : null,
+                // ★詰み関連のサマリー（必至・詰みN手が出た手だけ抜き出し）
+                mateSummary: analysisData
+                    .filter(d => d.mateNote)
+                    .map(d => ({ ply: d.ply, side: d.side, note: d.mateNote })),
+                data: analysisData
+            }
+        };
+
+        const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'kifu_' + new Date().toISOString().slice(0, 10) + '.json';
         a.click();
         URL.revokeObjectURL(url);
     });

@@ -26,17 +26,7 @@ function classifyLoss(lossCp) {
 }
 
 // ★詰み探索/防御フラグを安全に読む（関数が存在すれば呼ぶ）
-function readMateInfo() {
-    const g = (name) => (typeof Engine[name] === 'function' ? Engine[name]() : 0);
-    return {
-        mateSearchRan:    g('_engine_getAnalyzeMateSearchRan'),
-        mateFound:        g('_engine_getAnalyzeMateFound'),
-        mateLen:          g('_engine_getAnalyzeMateLen'),
-        defenseSearchRan: g('_engine_getAnalyzeDefenseSearchRan'),
-        defenseTriggered: g('_engine_getAnalyzeDefenseTriggered'),
-        defenseFound:     g('_engine_getAnalyzeDefenseFound'),
-    };
-}
+// （読み出し処理は engine-io.js の runAnalysis に移動：Worker と共有）
 
 // ★保存用：詰み探索/防御を短いテキストにする
 // 例: "詰み5手", "必至", "詰めろ回避", "詰み3手/詰めろ回避"
@@ -53,17 +43,27 @@ function mateNoteFromInfo(mi) {
 }
 
 // 現在のエンジン局面を「指さずに」解析する（engine_analyze 使用）
-function analyzeCurrentPosition(depth) {
+// 戻り値: 解析結果 | null（中断された）
+async function analyzeCurrentPosition(depth) {
     const side = Engine._engine_getSideToMove();
-    const scoreStm = Engine._engine_analyze(depth); // 手番側視点（詰み探索の汚染なし）
 
-    // ★analyze 直後にフラグを読む（次の呼び出しで上書きされる前に）
-    const mateInfo = readMateInfo();
+    // Worker で解析（使えなければメインスレッドで同期解析）
+    let r = await AIClient.analyze(depth);
+    if (r === null) return null;
+    let res;
+    if (r === undefined) {
+        await new Promise(resolve => setTimeout(resolve, 0));
+        res = runAnalysis(Engine, depth);
+    } else {
+        res = r.data;
+    }
+    const scoreStm = res.scoreStm; // 手番側視点（詰み探索の汚染なし）
+    const mateInfo = res.mate;
 
-    const from   = Engine._engine_getAnalyzeBestFrom();
-    const to     = Engine._engine_getAnalyzeBestTo();
-    const isDrop = Engine._engine_getAnalyzeBestIsDrop();
-    const dropPt = Engine._engine_getAnalyzeBestDropPiece();
+    const from   = res.best.from;
+    const to     = res.best.to;
+    const isDrop = res.best.isDrop;
+    const dropPt = res.best.dropPt;
 
     let bestMove = null;
     if (to >= 0) {
@@ -74,13 +74,12 @@ function analyzeCurrentPosition(depth) {
 
     // ★候補手（上位手とスコア）を取得
     const cands = [];
-    const cn = Engine._engine_getCandCount();
-    for (let k = 0; k < cn && k < 3; k++) {   // 上位3手
-        const cFrom  = Engine._engine_getCandFrom(k);
-        const cTo    = Engine._engine_getCandTo(k);
-        const cIsDrop= Engine._engine_getCandIsDrop(k);
-        const cDrop  = Engine._engine_getCandDropPiece(k);
-        const cScore = Engine._engine_getCandScore(k);
+    for (const c of res.cands) {   // 上位3手
+        const cFrom  = c.from;
+        const cTo    = c.to;
+        const cIsDrop= c.isDrop;
+        const cDrop  = c.dropPt;
+        const cScore = c.score;
         if (cTo < 0) continue;
         const mv = cIsDrop ? formatMove(-1, cTo, cDrop) : formatMove(cFrom, cTo, null);
         cands.push({ move: mv, score: cScore });  // score は手番側視点
@@ -103,7 +102,13 @@ async function analyzeKifu(depth) {
     for (let i = 0; i <= total; i++) {
         restoreEngineToPosition(i);
 
-        const a = analyzeCurrentPosition(depth);
+        const a = await analyzeCurrentPosition(depth);
+        if (a === null) {   // 中断（リセット等）
+            analyzing = false;
+            document.getElementById('analyze-btn').disabled = false;
+            if (progressEl) progressEl.textContent = '解析を中断しました';
+            return;
+        }
         const scoreSente = (a.side === 0) ? a.scoreStm : -a.scoreStm;
 
         analysisData.push({

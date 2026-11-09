@@ -327,6 +327,8 @@ function loadKifu(text) {
     }
     
     // リセットして棋譜を再生
+    AIClient.cancel();
+    aiThinking = false;
     Engine._engine_reset();
     moveHistory = [];
     savedBoardStates = [];
@@ -367,6 +369,8 @@ function loadKifu(text) {
 }
 
 function loadKifuJson(obj) {
+    AIClient.cancel();
+    aiThinking = false;
     Engine._engine_reset();
     moveHistory = [];
     savedBoardStates = [saveBoardState()];
@@ -477,6 +481,7 @@ async function initEngine() {
     try {
         Engine = await ChaturangaEngine();
         Engine._engine_init();
+        AIClient.warmup();   // 探索用Workerを先に起動しておく
         
         // 初期局面を保存
         savedBoardStates = [saveBoardState()];
@@ -856,11 +861,10 @@ async function aiMove() {
     turnEl.classList.add('thinking');
     turnEl.textContent = (Engine._engine_getSideToMove() === 0 ? '先手' : '後手') + 'AI思考中...';
     
-    await new Promise(r => setTimeout(r, 10));
-    
     const side = Engine._engine_getSideToMove();
     const depth = getAIDepth(side);
-    const result = Engine._engine_playAI(depth);
+    const result = await aiPlay(depth);
+    if (result === -1) return;   // リセット等で中断された
     
     aiThinking = false;
     turnEl.classList.remove('thinking');
@@ -910,6 +914,10 @@ function startSelfPlay() {
 
 function stopSelfPlay() {
     selfPlayRunning = false;
+    if (aiThinking) {            // 思考中なら探索を中断する
+        AIClient.cancel();
+        aiThinking = false;
+    }
     if (selfPlayTimer) {
         clearTimeout(selfPlayTimer);
         selfPlayTimer = null;
@@ -940,10 +948,9 @@ async function selfPlayStep() {
     const side = Engine._engine_getSideToMove();
     turnEl.textContent = (side === 0 ? '先手' : '後手') + 'AI思考中';
     
-    await new Promise(r => setTimeout(r, 10));
-    
     const depth = getAIDepth(side);
-    const result = Engine._engine_playAI(depth);
+    const result = await aiPlay(depth);
+    if (result === -1) return;   // 停止・リセット等で中断された
     
     aiThinking = false;
     turnEl.classList.remove('thinking');
@@ -992,6 +999,7 @@ function resetGame() {
         stopSelfPlay();
     }
     
+    AIClient.cancel();
     Engine._engine_reset();
     selectedSquare = null;
     selectedHand = null;
@@ -1280,11 +1288,12 @@ function aiThinkCurrentPosition() {
     turnEl.textContent = sideStr + ' (AI思考中...)';
     turnEl.classList.add('thinking');
     
-    setTimeout(() => {
+    setTimeout(async () => {
         const depth = getAIDepth(side);
         console.log('AI depth:', depth);
         
-        const result = Engine._engine_playAI(depth);
+        const result = await aiPlay(depth);
+        if (result === -1) return;   // リセット等で中断された
         
         if (result === 1) {
             const from = Engine._engine_getLastMoveFrom();

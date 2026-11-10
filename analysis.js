@@ -48,12 +48,13 @@ async function analyzeCurrentPosition(depth) {
     const side = Engine._engine_getSideToMove();
 
     // Worker で解析（使えなければメインスレッドで同期解析）
-    let r = await AIClient.analyze(depth);
+    const limitMs = getTimeLimitMs('analysis-time-limit');
+    let r = await AIClient.analyze(depth, limitMs);
     if (r === null) return null;
     let res;
     if (r === undefined) {
         await new Promise(resolve => setTimeout(resolve, 0));
-        res = runAnalysis(Engine, depth);
+        res = runAnalysis(Engine, depth, limitMs);
     } else {
         res = r.data;
     }

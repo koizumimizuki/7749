@@ -123,6 +123,19 @@
                         <option value="20">Lv20 (最強)</option>
                     </select>
                 </label>
+                <label>AI持ち時間(1手): 
+                    <select id="ai-time-limit">
+                        <option value="10000">10秒</option>
+                        <option value="20000">20秒</option>
+                        <option value="30000" selected>30秒</option>
+                        <option value="60000">1分</option>
+                        <option value="120000">2分</option>
+                        <option value="180000">3分</option>
+                        <option value="300000">5分</option>
+                        <option value="600000">10分</option>
+                        <option value="0">無制限</option>
+                    </select>
+                </label>
             </div>
             <div class="self-play-controls" id="self-play-controls" style="display:none;">
                 <button id="start-self-play">自己対局開始</button>
@@ -172,6 +185,19 @@
                     <option value="18">じっくり (Lv18)</option>
                     <option value="19">Lv19</option>
                     <option value="20">最強 (Lv20・とても遅い)</option>
+                </select>
+                </label>
+                <label>1手あたりの上限:
+                <select id="analysis-time-limit">
+                    <option value="10000" selected>10秒</option>
+                    <option value="20000">20秒</option>
+                    <option value="30000">30秒</option>
+                    <option value="60000">1分</option>
+                    <option value="120000">2分</option>
+                    <option value="180000">3分</option>
+                    <option value="300000">5分</option>
+                    <option value="600000">10分</option>
+                    <option value="0">無制限</option>
                 </select>
                 </label>
                 <button id="analyze-btn">この棋譜を解析</button>

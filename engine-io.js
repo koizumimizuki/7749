@@ -1,6 +1,7 @@
 // Worker とメインスレッド（フォールバック）で共有する解析結果の読み出し処理
 // E: ChaturangaEngine のインスタンス
-function runAnalysis(E, depth) {
+function runAnalysis(E, depth, timeLimitMs) {
+    if (typeof E._engine_setTimeLimit === 'function') E._engine_setTimeLimit(timeLimitMs | 0);
     const scoreStm = E._engine_analyze(depth);   // 手番側視点
 
     // analyze 直後にフラグを読む（次の呼び出しで上書きされる前に）

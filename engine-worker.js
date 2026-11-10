@@ -29,6 +29,7 @@ onmessage = (ev) => {
             return;
         }
         if (d.type === 'think') {
+            if (E._engine_setTimeLimit) E._engine_setTimeLimit(d.timeLimit | 0);
             const ok = E._engine_playAI(d.depth);
             postMessage({
                 type: 'result', id: d.id, ok: ok === 1,
@@ -36,7 +37,7 @@ onmessage = (ev) => {
                 score: ok === 1 ? E._engine_getLastScore() : 0,
             });
         } else if (d.type === 'analyze') {
-            postMessage({ type: 'result', id: d.id, data: runAnalysis(E, d.depth) });
+            postMessage({ type: 'result', id: d.id, data: runAnalysis(E, d.depth, d.timeLimit) });
         }
     } catch (e) {
         postMessage({ type: 'result', id: d.id, error: String(e) });

@@ -89,6 +89,21 @@ async function analyzeCurrentPosition(depth) {
     return { side, scoreStm, bestMove, cands, mateInfo };
 }
 
+// 解析中の進捗表示：何局面目か＋その局面の経過秒数（上限つき）
+function startAnalysisTicker(el, i, total) {
+    if (!el) return () => {};
+    const limitMs = getTimeLimitMs('analysis-time-limit');
+    const limitText = limitMs ? ` / 上限${formatTimeLimit(limitMs)}` : '';
+    const t0 = Date.now();
+    const tick = () => {
+        const sec = Math.floor((Date.now() - t0) / 1000);
+        el.textContent = `解析中... ${i + 1}/${total + 1}局面目 ${sec}秒${limitText}`;
+    };
+    tick();
+    const timer = setInterval(tick, 500);
+    return () => clearInterval(timer);
+}
+
 async function analyzeKifu(depth) {
     if (analyzing) return;
     if (moveHistory.length === 0) { alert('解析する棋譜がありません'); return; }
@@ -103,7 +118,9 @@ async function analyzeKifu(depth) {
     for (let i = 0; i <= total; i++) {
         restoreEngineToPosition(i);
 
+        const stopTicker = startAnalysisTicker(progressEl, i, total);
         const a = await analyzeCurrentPosition(depth);
+        stopTicker();
         if (a === null) {   // 中断（リセット等）
             analyzing = false;
             document.getElementById('analyze-btn').disabled = false;
